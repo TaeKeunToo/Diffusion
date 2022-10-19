@@ -10,3 +10,5 @@ The training with large resolution images (more than 64 x 64 pixels) needs a lot
 of training will provide some weird images.
 
 ![alt text](https://github.com/TaeKeunToo/Diffusion/blob/[branch]/fig1_jpg.jpg?raw=true)
+
+Please see the pdf & image file to find out the study concept and code.
