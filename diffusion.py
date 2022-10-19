@@ -1,3 +1,15 @@
+%%%
+% We modified the code from https://github.com/lucidrains/denoising-diffusion-pytorch to provide a 
+% hand-on experience to generate fundus photographs using DDPM.
+% -Ho, J., Jain, A. & Abbeel, P. Denoising diffusion probabilistic models. in Proceedings of the 34th 
+% International Conference on Neural Information Processing Systems 6840–6851 (2020)
+% The training with large resolution images (more than 64 x 64 pixels) needs a lot of time. Early stop 
+% of training will provide some weird images.
+%%%
+
+% This code is designed for implementation in the Colab.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !apt-get --purge remove cuda nvidia* libnvidia-*
 !dpkg -l | grep cuda- | awk '{print $2}' | xargs -n1 dpkg --purge
 !apt-get remove cuda-*
@@ -21,7 +33,10 @@
 
 
 %load_ext nvcc_plugin
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+from google.colab import drive
+drive.mount('/content/drive')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pip install denoising_diffusion_pytorch
 
@@ -40,19 +55,15 @@ model = Unet(
 diffusion = GaussianDiffusion(
     model,
     image_size = 128,
-    timesteps = 100,   # number of steps
+    timesteps = 1000,   # number of steps
     loss_type = 'l1'    # L1 or L2
 ).cuda()
 
 
-from google.colab import drive
-drive.mount('/content/drive')
-
-
 trainer = Trainer(diffusion, './drive/MyDrive/fundus', 
-                  train_batch_size = 4, 
+                  train_batch_size = 16, 
                   train_lr= 2e-5, 
-                  train_num_steps = 10000, 
+                  train_num_steps = 1000000, 
                   gradient_accumulate_every = 2, 
                   ema_decay = 0.995, 
                   amp = True)
@@ -62,15 +73,6 @@ trainer.train()
 sampled_images = diffusion.sample(batch_size = 4)
 tf = transforms.ToPILImage()
 img_1 = tf(sampled_images[1])
-img_2 = tf(sampled_images[2])
-img_3 = tf(sampled_images[3])
-img_4 = tf(sampled_images[4])
 
+%% show the image
 img_1
-
-img_2
-
-img_3
-
-img_4
-
